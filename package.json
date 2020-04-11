@@ -1,0 +1,17 @@
+{
+  "name": "ecommpay-donation-example",
+  "version": "1.0.0",
+  "description": "ECOMMPAY example app for accepting donations",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Mikko Ohtamaa",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "ecommpay": "^0.1.5-1",
+    "express": "^4.17.1"
+  }
+}

@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <title>ECOMMPAY donation example</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Get some bootstrap default styles -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  </head>
+  <body>
+    <!-- Construct a Bootstrap layout -->
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h1>Example donation form</h1>
+
+          <form method="POST" action="/pay">
+            <div class="form-group">
+              <label for="exampleInputEmail1">Your email address</label>
+              <input name="email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+              <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">$</span>
+              </div>
+              <input name="amount" type="text" class="form-control" aria-label="Amount">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Pay with a credit card payment</button>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- This is our example code -->
+    <script type="text/javascript" src="./example.js"></script>
+  </body>
+</html>
