@@ -12,6 +12,7 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "ecommpay": "^0.1.5-1",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "uuid": "^7.0.3"
   }
 }

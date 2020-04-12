@@ -1,4 +1,8 @@
+A donation app using ECOMMPAY payment gatewaay.
 
+# Prerequisites
+
+* Node v0.12
 
 # Install
 
@@ -6,12 +10,26 @@
 npm install
 ```
 
+Creata a `.env` file with the contents:
+
+```ini
+ECOMMPAY_PROJECT_ID = "..."
+
+ECOMMPAY_SECRET = "..."
+```
+
 # Run
 
 ```sh
-node server.js
+node src/server.js
 ```
 
-# Developer
+# Developmnet
 
-Visit
+Run Express in development mode:
+
+```sh
+npm install -g nodemon
+nodemon src/server.js
+```
+
