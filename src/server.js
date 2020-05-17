@@ -1,8 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const uuid = require('uuid');
-const assert = require('assert');
-const firebase = require('firebase');
 const admin = require('firebase-admin');
 const validate = require("validate.js");
 
@@ -19,7 +17,10 @@ require('dotenv').config();
 
 // Use JSON logging for log files
 log4js.configure({
-  appenders: { 'out': { type: 'stdout' } },
+  appenders: {
+    'out': { type: 'stdout' },
+    'logFile': { type: 'file', filename: 'log4js.log' },
+  },
   categories: { default: { appenders: ['out'], level: 'debug' } }
 });
 
@@ -101,6 +102,7 @@ app.post('/pay', (req, res) => {
   p.billingAddress = req.body.billingAddress;
   p.billingCity = req.body.billingCity;
   p.billingCountry = req.body.billingCountry;
+  p.forcePaymentMethod = "card";
 
   // https://github.com/ITECOMMPAY/paymentpage-sdk-js/blob/master/src/payment.js
   // https://developers.ecommpay.com/en/en_PP_Parameters.html
@@ -169,7 +171,7 @@ app.get('/ecommpay-success', (req, res) => {
 
   logger.info("Payment status update", paymentId, data);
   ref.update(data);
-  res.redirect("/");
+  res.redirect(process.env.FAILURE_REDIRECT);
 });
 
 // User failed a payment
@@ -186,7 +188,7 @@ app.get('/ecommpay-failure', (req, res) => {
 
   logger.info("Payment failure update", paymentId, data);
   ref.update(data);
-  res.redirect("/");
+  res.redirect(process.env.SUCCESS_REDIRECT);
 });
 
 /**
@@ -212,4 +214,4 @@ app.use(function (err, req, res, next) {
   res.status(500).send('Something broke!');
 });
 
-app.listen(port, () => logger.info(`Example app listening at http://localhost:${port}`));
+app.listen(port, () => logger.info(`Donation app listening at http://localhost:${port}`));

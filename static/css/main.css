@@ -1,0 +1,14 @@
+.content-wrapper {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+
+.credit-card-images {
+  text-align: center;
+}
+
+.credit-card-images img {
+  max-width: 48px;
+  margin-right: 10px;
+}

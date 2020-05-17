@@ -4,6 +4,10 @@ A donation app using ECOMMPAY payment gatewaay.
 
 * Node v0.12
 
+* Firebase account
+
+* Firebase database
+
 # Install
 
 ```sh
@@ -16,21 +20,31 @@ Creata a `.env` file with the contents:
 ECOMMPAY_PROJECT_ID = "..."
 
 ECOMMPAY_SECRET = "..."
+
+COLLECTION = "test_payments"
+
+NODE_ENV = "local"
+
+SUCCESS_REDIRECT = "https://google.com"
+
+FAILURE_REDIRECT = "https://google.com"
 ```
 
-# Run
+Drop your Firebase service account .json file as `secrets/firebase.json`.
 
-```sh
-node src/server.js
-```
-
-# Developmnet
+# Development
 
 Run Express in development mode:
 
 ```sh
 npm install -g nodemon
 nodemon src/server.js
+```
+
+# Run
+
+```sh
+node src/server.js
 ```
 
 # ECOMMPay reference manual
