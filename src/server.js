@@ -130,6 +130,8 @@ app.post('/pay', (req, res) => {
     billingCity: p.params.billing_city,
     billingCountry: p.params.billing_country,
     ecommURL: url,
+    ipAddress: req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+    ipCountry: req.headers['cf-ipcountry'],
   };
 
   logger.info("Adding new payment in", collectionName, key, data);
