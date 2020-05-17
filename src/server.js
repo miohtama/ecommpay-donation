@@ -25,18 +25,25 @@ log4js.configure({
 
 const logger = log4js.getLogger();
 
+// Initialize firebase
 const serviceAccount = require('../secrets/firebase.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
 
+// Database
 const db = admin.firestore();
 
+// Where do we store paymetn data
+// - we can switch between production and test collection
+const collectionName = process.env.COLLECTION;
+
+// Web server
 const app = express();
 const port = 3000;
 
-
+// Some Express.js initialization
 app.use(express.static('static'));
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
@@ -56,7 +63,7 @@ app.post('/pay', (req, res) => {
 
   const id = uuid.v4().toString();
 
-  let amount = parseFloat(req.body.amount);
+  let amount = parseFloat(req.body.amount.trim());
   if(amount < 1 || amount > 9999) {
     throw new Error("Invalid amount");
   }
@@ -80,8 +87,11 @@ app.post('/pay', (req, res) => {
     throw new Error(error);
   }
 
-  p.paymentAmount = req.body.amount;
-  p.paymentId = id;
+  // ECOMMPay success redirect does not pass the parameter correctly back if the key contains +
+  const key = (email + "@" + id).replace("+", "-");
+
+  p.paymentAmount = amount;
+  p.paymentId = key;
   p.paymentCurrency = 'USD';
   p.customerEmail = email;
   p.customerFirstName = req.body.customerFirstName;
@@ -101,11 +111,14 @@ app.post('/pay', (req, res) => {
   // const ref = db.ref();  //Set the current directory you are working in
 
   const url = p.getUrl();
-  const collectionName = process.env.COLLECTION;
+
+  // https://stackoverflow.com/a/60139054/315168
+  const createdAt = admin.firestore.Timestamp.fromDate(new Date());
 
   const data = {
+    createdAt,
     email: req.body.email,
-    amount: req.body.amount,
+    amount: amount,
     id: id,
     customerEmail: p.params.customer_email,
     customerFirstName: p.params.customer_first_name,
@@ -118,9 +131,9 @@ app.post('/pay', (req, res) => {
     ecommURL: url,
   };
 
-  logger.info("Adding new payment in", collectionName, id, data);
+  logger.info("Adding new payment in", collectionName, key, data);
 
-  const ref = db.collection(collectionName).doc(id);
+  const ref = db.collection(collectionName).doc(key);
   ref.set(data);
 
   logger.info("Constructed ECOMMPay URL", url);
@@ -128,8 +141,10 @@ app.post('/pay', (req, res) => {
 });
 
 
-app.get('/ecommpay-success', (req, res) => {
-  logger.info("Payment success", req.body);
+// TODO: How to configure?
+app.post('/ecommpay-callback', (req, res) => {
+
+  logger.info("Ecommpay callback", req.body);
 
   const callback = new Callback(process.env.ECOMMPAY_SECRET, req.body);
   if (callback.isPaymentSuccess()) {
@@ -139,12 +154,43 @@ app.get('/ecommpay-success', (req, res) => {
   }
 });
 
+// User completed a payment via a redict
+// Note that this cannot be trusted - you need to configure callback for it
+app.get('/ecommpay-success', (req, res) => {
+  logger.info("Payment success", req.query);
+  const paymentId = req.query.payment_id;
+
+  // Mark that the user completed the process
+  const ref = db.collection(collectionName).doc(paymentId);
+  const data = {
+    userStatus: "success",
+    userStatusAt: admin.firestore.Timestamp.fromDate(new Date())
+  }
+
+  logger.info("Payment status update", paymentId, data);
+  ref.update(data);
+  res.redirect("/");
+});
+
+// User failed a payment
 app.get('/ecommpay-failure', (req, res) => {
-  console.log("Failure");
-  console.log(req.body);
+  logger.info("Payment failure", req.query);
+  const paymentId = req.query.payment_id;
+
+  // Mark that the user completed the process
+  const ref = db.collection(collectionName).doc(paymentId);
+  const data = {
+    userStatus: "failure",
+    userStatusAt: admin.firestore.Timestamp.fromDate(new Date())
+  }
+
+  logger.info("Payment failure update", paymentId, data);
+  ref.update(data);
+  res.redirect("/");
 });
 
 /**
+ * TODO: How to configure?
  *
  * See https://developers.ecommpay.com/en/en_PP_redirect_modes.html
  */
@@ -158,8 +204,6 @@ app.post('/ecommpay-callback', function(req, res) {
   console.warning("Payment failed", callback);
 });
 
-app.get('/', (req, res) => res.send('ECOMMPAY service'));
-
 // Error handler
 // https://stackoverflow.com/a/56221138/315168
 app.use(function (err, req, res, next) {
@@ -169,4 +213,3 @@ app.use(function (err, req, res, next) {
 });
 
 app.listen(port, () => logger.info(`Example app listening at http://localhost:${port}`));
-
