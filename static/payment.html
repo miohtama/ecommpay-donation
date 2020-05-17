@@ -7,6 +7,7 @@
     <!-- Get some bootstrap default styles -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
+    <link rel="stylesheet" href="/css/bootstrap-select-country.min.css" />
     <link rel="stylesheet" href="https://paymentpage.ecommpay.com/shared/merchant.css" />
 
   </head>
@@ -18,20 +19,62 @@
           <h1>Example donation form</h1>
 
           <form method="POST" action="/pay">
+
+            <div class="form-group">
+              <label for="amount">Donation amount</label>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">$</span>
+                </div>
+                <input id="amount" name="amount" type="text" class="form-control" aria-label="Amount" required>
+              </div>
+
+            </div>
+
+
             <div class="form-group">
               <label for="exampleInputEmail1">Your email address</label>
-              <input name="email" type="email" class="form-control" id="email" aria-describedby="emailHelp">
-              <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+              <input name="email" type="email" class="form-control" id="email" aria-describedby="emailHelp" required>
+              <small id="emailHelp" class="form-text text-muted">We'll use your email only for communicating this project status.</small>
             </div>
 
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text">$</span>
-              </div>
-              <input id="amount" name="amount" type="text" class="form-control" aria-label="Amount">
+            <div class="form-group">
+              <label for="customerFirstName">First name</label>
+              <input name="customerFirstName" type="customerFirstName" class="form-control" id="customerFirstName" required>
             </div>
 
-            <button id="btn-pay" type="submit" class="btn btn-primary">Pay</button>
+            <div class="form-group">
+              <label for="customerLastName">Last name</label>
+              <input name="customerLastName" type="customerLastName" class="form-control" id="customerLastName" required>
+            </div>
+
+            <div class="form-group">
+              <label for="billingAddress">Your address</label>
+              <input name="billingAddress" type="billingAddress" class="form-control" id="billingAddress" required>
+              <small class="form-text text-muted">This information is needed for payment processing.</small>
+            </div>
+
+            <div class="form-group">
+              <label for="billingPostal">Postal code</label>
+              <input name="billingPostal" type="billingPostal" class="form-control" id="billingPostal required">
+            </div>
+
+            <div class="form-group">
+              <label for="billingCity">City</label>
+              <input name="billingCity" type="billingCity" class="form-control" id="billingCity" required>
+            </div>
+
+            <div class="form-group">
+              <label for="customerState">State</label>
+              <input name="customerState" type="customerState" class="form-control" id="customerState">
+              <small class="form-text text-muted">Fill only if you are a resident of the United States.</small>
+            </div>
+
+            <div class="form-group">
+              <label for="billingCountry">Country</label>
+              <select name="billingCountry" class="selectpicker countrypicker form-control" data-flag="true" required></select>
+            </div>
+            <button id="btn-pay" type="submit" class="btn btn-primary btn-block">Donate</button>
 
           </form>
 
@@ -48,6 +91,9 @@
     </div>
 
     <!-- ECOMMPay widget integration -->
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.bundle.js"></script>
+    <script type="text/javascript" src="/js/bootstrap-select-country.min.js"></script>
     <script type="text/javascript" src="https://paymentpage.ecommpay.com/shared/merchant.js"></script>
 
     <!-- Our application logic -->

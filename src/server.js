@@ -84,13 +84,13 @@ app.post('/pay', (req, res) => {
   p.paymentId = id;
   p.paymentCurrency = 'USD';
   p.customerEmail = email;
-  p.customerFirstName = "Mikko";
-  p.customerLastName = "Ohtamaa";
-  p.customerState = "";
-  p.billingPostal = "GX11 1AA";
-  p.billingAddress = "Roadroad 10"
-  p.billingCity = "Gibratalr";
-  p.billingCountry = "GI";
+  p.customerFirstName = req.body.customerFirstName;
+  p.customerLastName = req.body.customerLastName;
+  p.customerState = req.body.customerState;
+  p.billingPostal = req.body.billingPostal;
+  p.billingAddress = req.body.billingAddress;
+  p.billingCity = req.body.billingCity;
+  p.billingCountry = req.body.billingCountry;
 
   // https://github.com/ITECOMMPAY/paymentpage-sdk-js/blob/master/src/payment.js
   // https://developers.ecommpay.com/en/en_PP_Parameters.html
@@ -103,7 +103,6 @@ app.post('/pay', (req, res) => {
   const url = p.getUrl();
   const collectionName = process.env.COLLECTION;
 
-  console.log(p);
   const data = {
     email: req.body.email,
     amount: req.body.amount,
@@ -144,43 +143,6 @@ app.get('/ecommpay-failure', (req, res) => {
   console.log("Failure");
   console.log(req.body);
 });
-
-
-// Create payment object
-app.post('/create-payment', (req, res) => {
-
-  // Check that we correctly parsed incoming JSON data
-  assert(req.body.amount, "amount missing");
-  assert(req.body.email, "email missing");
-  assert(process.env.ECOMMPAY_PROJECT_ID);
-  assert(process.env.ECOMMPAY_SECRET);
-
-  params = {
-    project_id: process.env.ECOMMPAY_PROJECT_ID,
-    payment_amount: req.body.amount,
-    payment_id: uuid.v4().toString(),
-    payment_currency: "USD",
-    payment_description: "example",
-    customer_first_name: "Mikko",
-    customer_last_name: "Ohtamaa",
-    customer_phone: "+3581231231234",
-    // close_on_missclick: "1"
-  };
-
-  // Use random UUID v4 as salt
-  const salt = uuid.v4().toString();
-
-  // https://developers.ecommpay.com/en/en_PP_Authentication.html
-  params.signature = signer(params, process.env.ECOMMPAY_SECRET);
-
-  logger.info("Created payment parameters", params);
-  res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify(params));
-});
-
-
-
-
 
 /**
  *
