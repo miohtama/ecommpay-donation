@@ -13,6 +13,11 @@
     "dotenv": "^8.2.0",
     "ecommpay": "^0.1.5-1",
     "express": "^4.17.1",
-    "uuid": "^7.0.3"
+    "firebase": "^7.14.4",
+    "firebase-admin": "^8.12.1",
+    "log4js": "^6.2.1",
+    "uuid": "^7.0.3",
+    "validate.js": "^0.13.1",
+    "winston": "^3.2.1"
   }
 }

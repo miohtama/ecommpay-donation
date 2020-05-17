@@ -36,8 +36,8 @@ async function onPay() {
   const resp = await fetch("/create-payment", {
     method: 'POST',
     headers: {
-      //'Content-Type': 'application/json'
-      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'application/json'
+      // 'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: JSON.stringify(data)
   });
@@ -47,10 +47,9 @@ async function onPay() {
   //
   // Initialize ECOMMPAY widget
   // https://developers.ecommpay.com/en/en_PP_method_Embedded.html
-  parameters.target_element = "ecommpay-widget";
   // parameters.payment_methods_options={"card": {"redirect_window_height": 1200, "redirect_window_width": 1200}};
 
-  EPayWidget.run(parameters, 'post');
+  EPayWidget.run(parameters);
 
   payButton.removeAttribute("disabled");
   containerDonate.style.display = "none";
