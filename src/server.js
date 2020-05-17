@@ -7,7 +7,6 @@ const validate = require("validate.js");
 // const winston = require('winston');
 const log4js = require('log4js');
 
-
 //https://github.com/ITECOMMPAY/paymentpage-sdk-js/
 const { Payment, Callback, signer } = require('ecommpay');
 
@@ -15,7 +14,7 @@ const { Payment, Callback, signer } = require('ecommpay');
 require('dotenv').config();
 
 
-// Use JSON logging for log files
+// Configure logging
 log4js.configure({
   appenders: {
     'out': { type: 'stdout' },
@@ -42,7 +41,7 @@ const collectionName = process.env.COLLECTION;
 
 // Web server
 const app = express();
-const port = 3000;
+const port = (process.env.PORT && parseInt(process.env.PORT)) | 3000; // Allow configure the port on productoin
 
 // Some Express.js initialization
 app.use(express.static('static'));
