@@ -41,7 +41,7 @@ const collectionName = process.env.COLLECTION;
 
 // Web server
 const app = express();
-const port = (process.env.PORT && parseInt(process.env.PORT)) | 3000; // Allow configure the port on productoin
+const port = (process.env.PORT && parseInt(process.env.PORT)) || 3000; // Allow configure the port on productoin
 
 // Some Express.js initialization
 app.use(express.static('static'));
