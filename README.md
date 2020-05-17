@@ -47,6 +47,16 @@ nodemon src/server.js
 node src/server.js
 ```
 
+On the production run Node in port 80 - assuming proxy server:
+
+# Database backups
+
+To get a backup for the Firebase Cloud Storage:
+
+```sh
+node src/backup.js > backup-`date +%Y-%m-%d`.json
+```
+
 # ECOMMPay reference manual
 
 https://developers.ecommpay.com/en/en_PP_method_Embedded.html
