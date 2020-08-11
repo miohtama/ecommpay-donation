@@ -3,6 +3,10 @@
   margin: 0 auto;
 }
 
+.top-help-text {
+  max-width: 400px;
+  margin: 20px auto;
+}
 
 .credit-card-images {
   text-align: center;
@@ -14,6 +18,7 @@
 }
 
 .site-logo {
+  margin-top: 20px;
   max-width: 200px;
 }
 
