@@ -61,7 +61,9 @@ certbot certonly
 Then edit production `.env` file:
 
 ```ini
+COLLECTION = "payments"
 HTTPS_DOMAIN = "donate.ignitecovid19response.com"
+THANK_YOU_PAGE_URL = "https://ignitecovid19response.com/thank-you-for-the-payment"
 ```
 
 
