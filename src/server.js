@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const uuid = require('uuid');
 const admin = require('firebase-admin');
 const validate = require("validate.js");
+const https = require('https');
 
 // const winston = require('winston');
 const log4js = require('log4js');
@@ -214,5 +215,25 @@ app.use(function (err, req, res, next) {
   logger.error(err);
   res.status(500).send('Something broke!');
 });
+
+// https://itnext.io/node-express-letsencrypt-generate-a-free-ssl-certificate-and-run-an-https-server-in-5-minutes-a730fbe528ca
+if(process.env.HTTPS_DOMAIN) {
+  const privateKey = fs.readFileSync(`/etc/letsencrypt/live/${process.env.HTTPS_DOMAIN}/privkey.pem`, 'utf8');
+  const certificate = fs.readFileSync(`/etc/letsencrypt/live/${process.env.HTTPS_DOMAIN}/cert.pem`, 'utf8');
+  const ca = fs.readFileSync(`/etc/letsencrypt/live/${process.env.HTTPS_DOMAIN}/chain.pem`, 'utf8');
+
+  const credentials = {
+    key: privateKey,
+    cert: certificate,
+    ca: ca
+  };
+
+  const httpsServer = https.createServer(credentials, app);
+
+  httpsServer.listen(443, () => {
+    console.log('HTTPS Server running on port 443');
+  });
+
+}
 
 app.listen(port, () => logger.info(`Donation app listening at http://localhost:${port}`));

@@ -47,7 +47,23 @@ nodemon src/server.js
 node src/server.js
 ```
 
-On the production run Node in port 80 - assuming proxy server:
+On the production run Node in port 80/443.
+
+To run and install with Let's Encrypt.
+
+
+```bash
+sudo apt-get update -y
+sudo apt-get install -y certbot
+certbot certonly
+```
+
+Then edit production `.env` file:
+
+```ini
+HTTPS_DOMAIN = "donate.ignitecovid19response.com"
+```
+
 
 # Database backups
 
