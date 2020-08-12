@@ -175,6 +175,7 @@ app.get('/ecommpay-success', (req, res) => {
   logger.info("Payment status update", paymentId, data);
   ref.update(data);
 
+  logger.info("Redircting to", process.env.THANK_YOU_PAGE_URL);
   res.redirect(process.env.THANK_YOU_PAGE_URL || "/");
 });
 
