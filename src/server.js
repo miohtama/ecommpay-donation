@@ -193,7 +193,7 @@ app.get('/ecommpay-failure', (req, res) => {
 
   logger.info("Payment failure update", paymentId, data);
   ref.update(data);
-  res.redirect(process.env.SUCCESS_REDIRECT);
+  res.redirect(process.env.FAIL_PAGE_URL || "/");
 });
 
 /**
