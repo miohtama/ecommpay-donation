@@ -99,6 +99,7 @@ app.post('/pay', (req, res) => {
   p.customerFirstName = req.body.customerFirstName;
   p.customerLastName = req.body.customerLastName;
   p.customerState = req.body.customerState;
+  p.customerPhone = req.body.customerPhone;
   p.billingPostal = req.body.billingPostal;
   p.billingAddress = req.body.billingAddress;
   p.billingCity = req.body.billingCity;
@@ -131,6 +132,8 @@ app.post('/pay', (req, res) => {
     billingAddress: p.params.billing_address,
     billingCity: p.params.billing_city,
     billingCountry: p.params.billing_country,
+    customerState: p.params.customer_state,
+    customerPhone: p.params.customer_phone,
     ecommURL: url,
     ipAddress: req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress || null,
     ipCountry: req.headers['cf-ipcountry'] || null,

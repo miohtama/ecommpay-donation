@@ -41,6 +41,17 @@ npm install -g nodemon
 nodemon src/server.js
 ```
 
+## Test card details
+
+```
+4314220000000056 success
+5413330000000019 success
+4314220000000072 decline
+5413330000000035 decline
+4314220000000098 decline
+5413330000000092 decline
+```
+
 # Run
 
 ```sh
