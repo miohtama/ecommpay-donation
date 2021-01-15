@@ -104,7 +104,9 @@ app.post('/pay', (req, res) => {
   p.billingAddress = req.body.billingAddress;
   p.billingCity = req.body.billingCity;
   p.billingCountry = req.body.billingCountry;
-  p.forcePaymentMethod = "card";
+  // Please be advised that your integration has been updated from Card to Card-partner. Same was communicated to you back in October.
+  // force_payment_method=card-partner
+  p.forcePaymentMethod = "card-partner";
 
   // https://github.com/ITECOMMPAY/paymentpage-sdk-js/blob/master/src/payment.js
   // https://developers.ecommpay.com/en/en_PP_Parameters.html
