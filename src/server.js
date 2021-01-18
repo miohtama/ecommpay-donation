@@ -98,9 +98,10 @@ app.post('/pay', (req, res) => {
   p.customerEmail = email;
   p.customerFirstName = req.body.customerFirstName;
   p.customerLastName = req.body.customerLastName;
-  p.customerState = req.body.customerState;
+  // p.customerState = req.body.customerState;
+  // p.customerState = req.body.customerState;
   p.customerPhone = req.body.customerPhone;
-  p.billingPostal = req.body.billingPostal;
+  // p.billingPostal = req.body.billingPostal;
   p.billingAddress = req.body.billingAddress;
   p.billingCity = req.body.billingCity;
   p.billingCountry = req.body.billingCountry;
@@ -129,12 +130,11 @@ app.post('/pay', (req, res) => {
     customerEmail: p.params.customer_email,
     customerFirstName: p.params.customer_first_name,
     customerLastName: p.params.customer_last_name,
-    customerState: p.params.customer_state,
-    billingPostal: p.params.billing_postal,
+    customerState: p.params.customer_state|| "",
+    billingPostal: p.params.billing_postal || "",
     billingAddress: p.params.billing_address,
     billingCity: p.params.billing_city,
     billingCountry: p.params.billing_country,
-    customerState: p.params.customer_state,
     customerPhone: p.params.customer_phone,
     ecommURL: url,
     ipAddress: req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress || null,
