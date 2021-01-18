@@ -5,8 +5,7 @@ const uuid = require('uuid');
 const admin = require('firebase-admin');
 const validate = require("validate.js");
 const https = require('https');
-
-// const winston = require('winston');
+const fetch = require('node-fetch');
 const log4js = require('log4js');
 
 //https://github.com/ITECOMMPAY/paymentpage-sdk-js/
@@ -37,6 +36,21 @@ admin.initializeApp({
 // Database
 const db = admin.firestore();
 
+// Telegram notification details
+//
+// https://stackoverflow.com/questions/64990028/how-to-send-a-message-to-telegram-from-zapier
+//
+// Add the bot to a chat
+// In chat type: /start to make the bot to recognise the chat
+// Get chat it by calling TG getUpdates API in terminal and picking
+// the chat id from the output by hand
+//
+//  curl https://api.telegram.org/bot$TG_API_TOKEN/getUpdates | jq
+//
+const telegramToken = process.env.TELEGRAM_TOKEN;
+const telegramChatId = process.env.TELEGRAM_CHAT_ID;
+const telegramServerId = process.env.TELEGRAM_SERVER_ID;
+
 // Where do we store paymetn data
 // - we can switch between production and test collection
 const collectionName = process.env.COLLECTION;
@@ -50,13 +64,50 @@ app.use(express.static('static'));
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
 
+
+/**
+ * Send a Telegram notification on a new payment
+ */
+async function notifyAdmins(message) {
+
+  if(!telegramToken || !telegramChatId) {
+    logger.debug("Telegram notifications disabled");
+    return;
+  }
+
+  async function postData(url, data) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data) // body data type must match "Content-Type" header
+    });
+  return response.json(); // parses JSON response into native JavaScript objects
+  }
+
+  logger.debug("Sending to TG", message);
+
+  // Create sendMessage payload
+  const payload = { chat_id: telegramChatId, text: message, disable_notification: false };
+
+  // Which endpoint we are calling
+  const endpoint = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
+
+  // Call Telegram HTTP API
+  const resp = await postData(endpoint, payload);
+
+  logger.debug("TG response", resp);
+}
+
 // Push new visitors through payment HTMl
 app.get('/', (req, res) => {
   res.redirect('/payment.html')
 });
 
 // Push new visitors through payment HTMl
-app.post('/pay', (req, res) => {
+app.post('/pay', async (req, res) => {
 
   const baseUrl = req.protocol + '://' + req.get('host');
   logger.debug("Incoming pay", baseUrl, req.body);
@@ -98,13 +149,13 @@ app.post('/pay', (req, res) => {
   p.customerEmail = email;
   p.customerFirstName = req.body.customerFirstName;
   p.customerLastName = req.body.customerLastName;
-  // p.customerState = req.body.customerState;
-  // p.customerState = req.body.customerState;
+  p.customerState = req.body.customerState;
   p.customerPhone = req.body.customerPhone;
-  // p.billingPostal = req.body.billingPostal;
+  p.billingPostal = req.body.billingPostal;
   p.billingAddress = req.body.billingAddress;
   p.billingCity = req.body.billingCity;
   p.billingCountry = req.body.billingCountry;
+
   // Please be advised that your integration has been updated from Card to Card-partner. Same was communicated to you back in October.
   // force_payment_method=card-partner
   p.forcePaymentMethod = "card-partner";
@@ -148,6 +199,9 @@ app.post('/pay', (req, res) => {
 
   logger.info("Constructed ECOMMPay URL", url);
   res.redirect(url);
+
+  const dollars = amount / 100.0;
+  await notifyAdmins(`User starting payment process server:${telegramServerId} email:${data.email}, name:${data.customerFirstName} ${data.customerLastName} country:${data.billingCountry} amount:${dollars}`);
 });
 
 
@@ -166,7 +220,7 @@ app.post('/ecommpay-callback', (req, res) => {
 
 // User completed a payment via a redict
 // Note that this cannot be trusted - you need to configure callback for it
-app.get('/ecommpay-success', (req, res) => {
+app.get('/ecommpay-success', async (req, res) => {
   logger.info("Payment success", req.query);
   const paymentId = req.query.payment_id;
 
@@ -182,6 +236,8 @@ app.get('/ecommpay-success', (req, res) => {
 
   logger.info("Redircting to", process.env.THANK_YOU_PAGE_URL);
   res.redirect(process.env.THANK_YOU_PAGE_URL || "/");
+
+  await notifyAdmins(`Payment success ${telegramServerId}. email:${ref.email}, amount:${ref.amount}`);
 });
 
 // User failed a payment

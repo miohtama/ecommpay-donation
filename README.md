@@ -14,7 +14,7 @@ A donation app using ECOMMPAY payment gatewaay.
 npm install
 ```
 
-Creata a `.env` file with the contents:
+Create a `.env` file with the contents:
 
 ```ini
 ECOMMPAY_PROJECT_ID = "..."
@@ -28,6 +28,12 @@ NODE_ENV = "local"
 SUCCESS_REDIRECT = "https://google.com"
 
 FAILURE_REDIRECT = "https://google.com"
+
+TELEGRAM_TOKEN = "..."
+
+TELEGRAM_CHAT_IT = "..."
+
+TELEGRAM_SERVER_ID = "my localhost test server"
 ```
 
 Drop your Firebase service account .json file as `secrets/firebase.json`.
