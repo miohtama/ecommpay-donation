@@ -31,7 +31,7 @@ FAILURE_REDIRECT = "https://google.com"
 
 TELEGRAM_TOKEN = "..."
 
-TELEGRAM_CHAT_IT = "..."
+TELEGRAM_CHAT_ID = "..."
 
 TELEGRAM_SERVER_ID = "my localhost test server"
 ```

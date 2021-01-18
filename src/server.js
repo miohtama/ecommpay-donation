@@ -51,6 +51,9 @@ const telegramToken = process.env.TELEGRAM_TOKEN;
 const telegramChatId = process.env.TELEGRAM_CHAT_ID;
 const telegramServerId = process.env.TELEGRAM_SERVER_ID;
 
+// Allow API access to the server data with this key
+const apiKey = process.env.API_KEY;
+
 // Where do we store paymetn data
 // - we can switch between production and test collection
 const collectionName = process.env.COLLECTION;
@@ -84,7 +87,7 @@ async function notifyAdmins(message) {
         },
         body: JSON.stringify(data) // body data type must match "Content-Type" header
     });
-  return response.json(); // parses JSON response into native JavaScript objects
+    return response.json(); // parses JSON response into native JavaScript objects
   }
 
   logger.debug("Sending to TG", message);
@@ -150,7 +153,9 @@ app.post('/pay', async (req, res) => {
   p.customerFirstName = req.body.customerFirstName;
   p.customerLastName = req.body.customerLastName;
   p.customerState = req.body.customerState;
-  p.customerPhone = req.body.customerPhone;
+  // Plus in a phone number is encoded in the URL and currently Ecommpay cannot handle this.
+  // Normalise all phone number pluses as zero zero.
+  p.customerPhone = req.body.customerPhone.replace("+", "00");
   p.billingPostal = req.body.billingPostal;
   p.billingAddress = req.body.billingAddress;
   p.billingCity = req.body.billingCity;
@@ -181,8 +186,8 @@ app.post('/pay', async (req, res) => {
     customerEmail: p.params.customer_email,
     customerFirstName: p.params.customer_first_name,
     customerLastName: p.params.customer_last_name,
-    customerState: p.params.customer_state|| "",
-    billingPostal: p.params.billing_postal || "",
+    customerState: p.params.customer_state|| null,
+    billingPostal: p.params.billing_postal || null,
     billingAddress: p.params.billing_address,
     billingCity: p.params.billing_city,
     billingCountry: p.params.billing_country,
@@ -197,11 +202,11 @@ app.post('/pay', async (req, res) => {
   const ref = db.collection(collectionName).doc(key);
   ref.set(data);
 
+  const dollars = amount / 100.0;
+  await notifyAdmins(`🚦 User starting payment process\nServer:${telegramServerId}\nEmail: ${data.email}\nName:${data.customerFirstName} ${data.customerLastName}\nCountry:${data.billingCountry}\nAmount:${dollars} USD\nCountry of IP address:${data.ipCountry}`);
+
   logger.info("Constructed ECOMMPay URL", url);
   res.redirect(url);
-
-  const dollars = amount / 100.0;
-  await notifyAdmins(`User starting payment process server:${telegramServerId} email:${data.email}, name:${data.customerFirstName} ${data.customerLastName} country:${data.billingCountry} amount:${dollars}`);
 });
 
 
@@ -234,14 +239,17 @@ app.get('/ecommpay-success', async (req, res) => {
   logger.info("Payment status update", paymentId, data);
   ref.update(data);
 
+  const doc = await ref.get();
+  const info = doc.data();
+
+  await notifyAdmins(`✅ Payment OK!\nServer: ${telegramServerId}\nEmail: ${info.email}\nAmount: ${info.amount}`);
+
   logger.info("Redircting to", process.env.THANK_YOU_PAGE_URL);
   res.redirect(process.env.THANK_YOU_PAGE_URL || "/");
-
-  await notifyAdmins(`Payment success ${telegramServerId}. email:${ref.email}, amount:${ref.amount}`);
 });
 
 // User failed a payment
-app.get('/ecommpay-failure', (req, res) => {
+app.get('/ecommpay-failure', async (req, res) => {
   logger.info("Payment failure", req.query);
   const paymentId = req.query.payment_id;
 
@@ -254,6 +262,12 @@ app.get('/ecommpay-failure', (req, res) => {
 
   logger.info("Payment failure update", paymentId, data);
   ref.update(data);
+
+  const doc = await ref.get();
+  const info = doc.data();
+
+  await notifyAdmins(`🛑 Payment failed\nServer: ${telegramServerId}\nEmail: ${info.email}\nAmount: ${info.amount}`);
+
   res.redirect(process.env.FAIL_PAGE_URL || "/");
 });
 
@@ -271,6 +285,39 @@ app.post('/ecommpay-callback', function(req, res) {
   }
   console.warning("Payment failed", callback);
 });
+
+
+/**
+ * Show last few entries in machine readbale format.
+ *
+ */
+app.get('/diagnose', async function(req, res) {
+  const apiKeyInput = req.query.apiKey;
+
+  if(apiKeyInput != apiKey || !apiKey) {
+    throw new Error("Mismatching API key");
+  }
+
+
+  const result = [];
+  const snapshot = await db.collection(collectionName).orderBy("createdAt", "desc").limit(5).get();
+  console.log(snapshot);
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    logger.info("Result", doc.id, data);
+    result.push({
+      createdAt: data.createdAt._seconds,
+      email: data.email,
+      amount: data.amount,
+      billingCountry: data.billingCountry,
+    });
+  });
+
+  res.setHeader('Content-Type', 'application/json');
+  res.end(JSON.stringify({ status: "Ok", result }));
+
+});
+
 
 // Error handler
 // https://stackoverflow.com/a/56221138/315168
