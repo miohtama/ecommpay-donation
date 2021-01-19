@@ -152,11 +152,15 @@ app.post('/pay', async (req, res) => {
   p.customerEmail = email;
   p.customerFirstName = req.body.customerFirstName;
   p.customerLastName = req.body.customerLastName;
-  p.customerState = req.body.customerState;
+
+  // No postal
+  // p.customerState = req.body.customerState;
+  // p.billingPostal = req.body.billingPostal;
+
   // Plus in a phone number is encoded in the URL and currently Ecommpay cannot handle this.
   // Normalise all phone number pluses as zero zero.
   p.customerPhone = req.body.customerPhone.replace("+", "00");
-  p.billingPostal = req.body.billingPostal;
+
   p.billingAddress = req.body.billingAddress;
   p.billingCity = req.body.billingCity;
   p.billingCountry = req.body.billingCountry;
