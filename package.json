@@ -12,7 +12,7 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "ecommpay": "^0.1.5-1",
-    "express": "^4.17.1",
+    "express": "^4.18.2",
     "firebase": "^7.14.4",
     "firebase-admin": "^8.12.1",
     "firestore-export-import": "^0.5.0",
